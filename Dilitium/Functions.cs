@@ -16,9 +16,22 @@ namespace Dilitium
 {
     public class Functions
     {
-
+        static Dictionary<string, DilithiumParameters> parametrs = new()
+        { {"d2", DilithiumParameters.Dilithium2},
+            {"d2aes", DilithiumParameters.Dilithium2Aes},
+            {"d3", DilithiumParameters.Dilithium3},
+            {"d3aes", DilithiumParameters.Dilithium3Aes},
+            {"d5", DilithiumParameters.Dilithium5},
+            {"d5aes", DilithiumParameters.Dilithium5Aes},
+        };
         static SecureRandom random = new SecureRandom();
+        static DilithiumParameters dil = DilithiumParameters.Dilithium3;
         static DilithiumKeyGenerationParameters keyGenParameters = new DilithiumKeyGenerationParameters(random, DilithiumParameters.Dilithium3);
+        public static void SetParametrs(DilithiumParameters dilithium)
+        {
+            keyGenParameters = new DilithiumKeyGenerationParameters(random, dilithium);
+            dil = dilithium;
+        }
         public static AsymmetricCipherKeyPair GenerateKeys()
         {
             var dilithiumKeyPairGenerator = new DilithiumKeyPairGenerator();
@@ -34,13 +47,13 @@ namespace Dilitium
             var alice = new DilithiumSigner();
             alice.Init(true, privateKey);
             var signature = alice.GenerateSignature(data);
-            return new Sign { signature = Convert.ToBase64String(signature), publicKey = Convert.ToBase64String(pubEncoded) };
+            return new Sign { signature = Convert.ToBase64String(signature), publicKey = Convert.ToBase64String(pubEncoded), parametrs = parametrs.FirstOrDefault(pair => pair.Value == dil).Key };
         }
         public static bool CheckSign(byte[] data, Sign sign)
         {
             var signature = Convert.FromBase64String(sign.signature);
             var pk = Convert.FromBase64String(sign.publicKey);
-            var publicKey = new DilithiumPublicKeyParameters(DilithiumParameters.Dilithium3, pk);
+            var publicKey = new DilithiumPublicKeyParameters(parametrs[sign.parametrs], pk);
             var bob = new DilithiumSigner();
             bob.Init(false, publicKey);
             var verified = bob.VerifySignature(data, signature);
@@ -81,5 +94,6 @@ namespace Dilitium
     {
         public string signature { get; set; }
         public string publicKey { get; set; }
+        public string parametrs { get; set; }
     }
 }

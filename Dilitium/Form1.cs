@@ -25,28 +25,11 @@ namespace Dilitium
                 }
             }
         }
-        public void AddNewFile(string path)
+        public void AddFile(string path)
         {
-            var data = File.ReadAllBytes(path);
-            var watch = new Stopwatch();
-            watch.Start();
-            var cycles = Functions.GetCpuCyclesAndMemory(() => Functions.GenerateKeys());
-            watch.Stop();
-            var mess = $"Файл успешно сохранен!\n\nTime (generate keys): {watch.ElapsedMilliseconds}мс\nCPU cycles (generate keys): {cycles.cycles}\nMemory usage (generate keys): {cycles.memoryUsage}";
-            var keys = Functions.GenerateKeys();
-            watch.Reset();
-            watch.Start();
-            cycles = Functions.GetCpuCyclesAndMemory(() => Functions.CreateSign(data,keys));
-            watch.Stop();
-            var sign = Functions.CreateSign(data, keys);
-            File.Copy(path, Path.Combine("res", Path.GetFileName(path)));
-            File.WriteAllText(Path.Combine("res", $"{Path.GetFileNameWithoutExtension(path)}.sign"), JsonSerializer.Serialize(sign));
-            File.SetAttributes(Path.Combine("res", Path.GetFileName(path)), FileAttributes.ReadOnly);
-            File.SetAttributes(Path.Combine("res", $"{Path.GetFileNameWithoutExtension(path)}.sign"), FileAttributes.ReadOnly);
             files.Add(Path.GetFileName(path));
             var button = new FileButton(Path.GetFileName(path), FileButton_DoubleClick);
             flowLayoutPanel.Controls.Add(button);
-            MessageBox.Show($"{mess}\nTime (sign): {watch.ElapsedMilliseconds}мс\nCPU cycles (sign): {cycles.cycles}\nMemory usage (sign): {cycles.memoryUsage}");
         }
         public void OpenFile(string file)
         {
@@ -97,7 +80,8 @@ namespace Dilitium
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    AddNewFile(openFileDialog.FileName);
+                    var addForm = new AddFileForm(openFileDialog.FileName, this);
+                    addForm.ShowDialog();
                 }
             }
         }
