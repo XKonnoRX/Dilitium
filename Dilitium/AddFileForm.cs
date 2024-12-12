@@ -1,4 +1,5 @@
-﻿using Org.BouncyCastle.Crypto;
+﻿using Microsoft.VisualBasic;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Pqc.Crypto.Crystals.Dilithium;
 using System;
 using System.Collections.Generic;
@@ -57,7 +58,7 @@ namespace Dilitium
             var publ = ((DilithiumPublicKeyParameters)keys.Public).GetEncoded();
             secrestBox.Text = Convert.ToBase64String(secret);
             publicBox.Text = Convert.ToBase64String(publ);
-            logBox.Text = $"Time: {watch.ElapsedMilliseconds}мс\r\nCPU cycles: {cycles.cycles}\r\nMemory usage: {cycles.memoryUsage}";
+            logBox.Text = $"Time: {watch.ElapsedMilliseconds}мс\r\nCPU cycles: {cycles.cycles}\r\nMemory usage: {cycles.memoryUsage}\r\nSecret key size: {secret.Length}\r\nPublic key size: {publ.Length}";
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -73,7 +74,7 @@ namespace Dilitium
             File.SetAttributes(Path.Combine("res", Path.GetFileName(FilePath)), FileAttributes.ReadOnly);
             File.SetAttributes(Path.Combine("res", $"{Path.GetFileNameWithoutExtension(FilePath)}.sign"), FileAttributes.ReadOnly);
             mainForm.AddFile(FilePath);
-            MessageBox.Show($"Файл успешно подписан\nTime: {watch.ElapsedMilliseconds}мс\nCPU cycles: {cycles.cycles}\nMemory usage: {cycles.memoryUsage}");
+            MessageBox.Show($"Файл успешно подписан\nTime: {watch.ElapsedMilliseconds}мс\nCPU cycles: {cycles.cycles}\nMemory usage: {cycles.memoryUsage}\nSing size: {Convert.FromBase64String(sign.signature).Length}");
             this.Close();
         }
     }
